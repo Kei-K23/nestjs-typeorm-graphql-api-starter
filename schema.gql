@@ -1,0 +1,59 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  id: ID!
+  fullName: String!
+  email: String!
+  isActive: Boolean!
+  createdAt: DateTime!
+  updatedAt: DateTime!
+}
+
+"""
+A date-time string at UTC, such as 2019-12-03T09:54:33Z, compliant with the date-time format.
+"""
+scalar DateTime
+
+type PaginatedUsers {
+  items: [User!]!
+  total: Int!
+  limit: Int!
+  offset: Int!
+}
+
+type Query {
+  getUsers(search: String, limit: Int = 20, offset: Int = 0, orderDirection: SortDirection, isActive: Boolean, orderBy: UserOrderBy): PaginatedUsers!
+  getUserById(id: Int!): User!
+}
+
+enum SortDirection {
+  ASC
+  DESC
+}
+
+enum UserOrderBy {
+  CREATED_AT
+  FULL_NAME
+  EMAIL
+}
+
+type Mutation {
+  createUser(createUserInput: CreateUserInput!): User!
+  updateUser(updateUserInput: UpdateUserInput!): User!
+  removeUser(id: Int!): User!
+}
+
+input CreateUserInput {
+  fullName: String!
+  email: String!
+  password: String!
+}
+
+input UpdateUserInput {
+  fullName: String
+  email: String
+  password: String
+  id: Int!
+}
