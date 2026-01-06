@@ -5,6 +5,11 @@ import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { GetUsersArgs } from './dto/get-users.args';
 import { PaginatedUsers } from './response/paginated-user';
+import { UseGuards } from '@nestjs/common';
+import { GqlAuthGuard } from 'src/auth/gql-auth.guard';
+import { RolesGuard } from 'src/auth/roles.guard';
+import { Roles } from 'src/auth/roles.decorator';
+import { UserRole } from './entities/user.entity';
 
 @Resolver(() => User)
 export class UserResolver {
@@ -26,11 +31,20 @@ export class UserResolver {
   }
 
   @Mutation(() => User)
+  @UseGuards(GqlAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   async updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
-    return await this.userService.update(updateUserInput.id, updateUserInput);
+    const user = await this.userService.update(
+      updateUserInput.id,
+      updateUserInput,
+    );
+
+    return user;
   }
 
   @Mutation(() => User)
+  @UseGuards(GqlAuthGuard, RolesGuard)
+  @Roles(UserRole.ADMIN)
   async removeUser(@Args('id', { type: () => Int }) id: number) {
     return await this.userService.remove(id);
   }

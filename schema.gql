@@ -7,8 +7,14 @@ type User {
   fullName: String!
   email: String!
   isActive: Boolean!
+  role: UserRole!
   createdAt: DateTime!
   updatedAt: DateTime!
+}
+
+enum UserRole {
+  USER
+  ADMIN
 }
 
 """
@@ -23,9 +29,16 @@ type PaginatedUsers {
   offset: Int!
 }
 
+type AuthResponse {
+  accessToken: String!
+  refreshToken: String!
+  user: User!
+}
+
 type Query {
   getUsers(search: String, limit: Int = 20, offset: Int = 0, orderDirection: SortDirection, isActive: Boolean, orderBy: UserOrderBy): PaginatedUsers!
   getUserById(id: Int!): User!
+  me: User!
 }
 
 enum SortDirection {
@@ -43,6 +56,9 @@ type Mutation {
   createUser(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
   removeUser(id: Int!): User!
+  login(loginInput: LoginInput!): AuthResponse!
+  refreshTokens(userId: Int!, refreshToken: String!): AuthResponse!
+  logout: Boolean!
 }
 
 input CreateUserInput {
@@ -56,4 +72,9 @@ input UpdateUserInput {
   email: String
   password: String
   id: Int!
+}
+
+input LoginInput {
+  email: String!
+  password: String!
 }

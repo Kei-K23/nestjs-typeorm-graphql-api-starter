@@ -47,7 +47,7 @@ export class UserService {
     }
 
     if (isActive !== undefined) {
-      qb.where('user.isActive = :isActive', { isActive });
+      qb.andWhere('user.isActive = :isActive', { isActive });
     }
 
     qb.orderBy(`user.${orderBy}`, orderDirection);
@@ -63,7 +63,11 @@ export class UserService {
   }
 
   async findOne(id: number) {
-    return await this.usersRepository.findOne({ where: { id } });
+    const user = await this.usersRepository.findOne({ where: { id } });
+    if (!user) {
+      throw new Error(`User not found with id ${id}`);
+    }
+    return user;
   }
 
   async update(id: number, updateUserInput: UpdateUserInput) {
@@ -74,7 +78,13 @@ export class UserService {
       );
     }
 
-    return await this.usersRepository.update(id, updateUserInput);
+    const result = await this.usersRepository.update(id, updateUserInput);
+
+    if (result.affected === 0) {
+      throw new Error(`User not found with id ${id}`);
+    }
+
+    return await this.findOne(id);
   }
 
   async remove(id: number) {

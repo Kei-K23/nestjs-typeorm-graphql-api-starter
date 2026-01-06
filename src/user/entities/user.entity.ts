@@ -4,6 +4,7 @@ import {
   ID,
   GraphQLISODateTime,
   HideField,
+  registerEnumType,
 } from '@nestjs/graphql';
 import {
   Column,
@@ -13,6 +14,13 @@ import {
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
+
+export enum UserRole {
+  USER = 'USER',
+  ADMIN = 'ADMIN',
+}
+
+registerEnumType(UserRole, { name: 'UserRole' });
 
 @ObjectType()
 @Entity({ name: 'users' })
@@ -38,6 +46,14 @@ export class User {
   @Field(() => Boolean)
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
+
+  @Field(() => UserRole)
+  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
+  role: UserRole;
+
+  @HideField()
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  refreshTokenHash?: string | null;
 
   @Field(() => GraphQLISODateTime)
   @CreateDateColumn()

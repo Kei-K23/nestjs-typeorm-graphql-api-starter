@@ -3,6 +3,7 @@ import { GraphQLModule } from '@nestjs/graphql';
 import { ApolloDriver, ApolloDriverConfig } from '@nestjs/apollo';
 import { UserModule } from './user/user.module';
 import { TypeOrmModule } from '@nestjs/typeorm';
+import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -25,8 +26,10 @@ import { TypeOrmModule } from '@nestjs/typeorm';
       buildSchemaOptions: {
         dateScalarMode: 'timestamp',
       },
+      context: ({ req }: { req: unknown }) => ({ req }),
     }),
     UserModule,
+    AuthModule,
   ],
   controllers: [],
   providers: [],
