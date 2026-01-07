@@ -54,6 +54,8 @@ async function bootstrap() {
   app.enableCors(corsOptions);
 
   await app.listen(process.env.PORT ?? 3000);
-  console.log(`Application is running on port ${process.env.PORT ?? 3000}`);
+  console.log(
+    `${configService.get<string>('APP_NAME')} is running on port ${process.env.PORT ?? 3000} (GraphQL Server)`,
+  );
 }
 bootstrap();

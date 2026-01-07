@@ -28,10 +28,10 @@ export enum PermissionType {
 registerEnumType(PermissionType, { name: 'PermissionType' });
 
 export enum PermissionModule {
-  USERS = 'Users',
-  ROLES = 'Roles',
-  ACTIVITY_LOGS = 'Activity Logs',
-  SETTINGS = 'Settings',
+  USER = 'User',
+  ROLE = 'Role',
+  ACTIVITY_LOG = 'Activity_Log',
+  SETTING = 'Setting',
 }
 
 @Entity('permissions')
