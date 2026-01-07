@@ -16,4 +16,7 @@ export class GetUsersArgs extends DefaultFilterDto {
 
   @Field(() => UserOrderBy, { nullable: true })
   orderBy?: UserOrderBy;
+
+  @Field({ nullable: true })
+  roleId?: string;
 }

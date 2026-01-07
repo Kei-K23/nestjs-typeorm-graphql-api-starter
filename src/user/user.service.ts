@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { CreateUserInput } from './dto/create-user.input';
 import { UpdateUserInput } from './dto/update-user.input';
 import { InjectRepository } from '@nestjs/typeorm';
@@ -7,6 +7,7 @@ import { Repository } from 'typeorm';
 import { GetUsersArgs, UserOrderBy } from './dto/get-users.args';
 import { SortDirection } from 'src/common/dto/default-filter.dto';
 import { AuthService } from 'src/auth/auth.service';
+import { Role } from 'src/role/entities/role.entity';
 
 @Injectable()
 export class UserService {
@@ -14,15 +15,29 @@ export class UserService {
     private authService: AuthService,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
+    @InjectRepository(Role)
+    private rolesRepository: Repository<Role>,
   ) {}
 
   async create(createUserInput: CreateUserInput) {
+    // Check if roleId exists
+    const role = await this.rolesRepository.findOne({
+      select: { id: true },
+      where: { id: createUserInput.roleId },
+    });
+    if (!role) {
+      throw new NotFoundException(
+        `Role not found with id ${createUserInput.roleId}`,
+      );
+    }
+
     // Hash password
     createUserInput.password = await this.authService.passwordHash(
       createUserInput.password,
     );
 
-    return await this.usersRepository.save(createUserInput);
+    const user = this.usersRepository.create(createUserInput);
+    return await this.usersRepository.save(user);
   }
 
   async findAll(args: GetUsersArgs) {
@@ -33,10 +48,12 @@ export class UserService {
       offset,
       orderBy = UserOrderBy.CREATED_AT,
       orderDirection = SortDirection.DESC,
+      roleId,
     } = args;
 
     const qb = this.usersRepository
       .createQueryBuilder('user')
+      .leftJoinAndSelect('user.role', 'role')
       .skip(offset)
       .take(limit);
 
@@ -48,6 +65,10 @@ export class UserService {
 
     if (isActive !== undefined) {
       qb.andWhere('user.isActive = :isActive', { isActive });
+    }
+
+    if (roleId) {
+      qb.andWhere('user.roleId = :roleId', { roleId });
     }
 
     qb.orderBy(`user.${orderBy}`, orderDirection);
@@ -62,15 +83,42 @@ export class UserService {
     };
   }
 
-  async findOne(id: number) {
-    const user = await this.usersRepository.findOne({ where: { id } });
+  async findOne(id: string) {
+    const user = await this.usersRepository.findOne({
+      where: { id },
+      relations: ['role'],
+    });
+
     if (!user) {
-      throw new Error(`User not found with id ${id}`);
+      throw new NotFoundException(`User not found with id ${id}`);
     }
     return user;
   }
 
-  async update(id: number, updateUserInput: UpdateUserInput) {
+  async update(id: string, updateUserInput: UpdateUserInput) {
+    // Check if user exists
+    const user = await this.usersRepository.findOne({
+      select: { id: true },
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User not found with id ${id}`);
+    }
+
+    // Check if roleId exists
+    if (updateUserInput.roleId) {
+      const role = await this.rolesRepository.findOne({
+        where: { id: updateUserInput.roleId },
+      });
+
+      if (!role) {
+        throw new NotFoundException(
+          `Role not found with id ${updateUserInput.roleId}`,
+        );
+      }
+    }
+
     // Hash password if it's provided
     if (updateUserInput.password) {
       updateUserInput.password = await this.authService.passwordHash(
@@ -78,16 +126,27 @@ export class UserService {
       );
     }
 
-    const result = await this.usersRepository.update(id, updateUserInput);
+    const updatedUser = await this.usersRepository.preload({
+      ...updateUserInput,
+    });
 
-    if (result.affected === 0) {
-      throw new Error(`User not found with id ${id}`);
+    if (!updatedUser) {
+      throw new NotFoundException(`User not found with id ${id}`);
     }
 
-    return await this.findOne(id);
+    return updatedUser;
   }
 
-  async remove(id: number) {
+  async remove(id: string) {
+    // Check if user exists
+    const user = await this.usersRepository.findOne({
+      select: { id: true },
+      where: { id },
+    });
+
+    if (!user) {
+      throw new NotFoundException(`User not found with id ${id}`);
+    }
     return await this.usersRepository.delete(id);
   }
 }

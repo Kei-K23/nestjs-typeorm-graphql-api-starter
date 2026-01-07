@@ -1,12 +1,11 @@
-import { Resolver, Mutation, Args, Query, Int } from '@nestjs/graphql';
+import { Resolver, Mutation, Args, Query } from '@nestjs/graphql';
 import { AuthService } from './auth.service';
 import { AuthResponse } from './dto/auth-response.type';
 import { LoginInput } from './dto/login.input';
 import { UseGuards } from '@nestjs/common';
 import { GqlAuthGuard } from './gql-auth.guard';
 import { RolesGuard } from './roles.guard';
-import { Roles } from './roles.decorator';
-import { User, UserRole } from 'src/user/entities/user.entity';
+import { User } from 'src/user/entities/user.entity';
 import { CurrentUser } from './current-user.decorator';
 
 @Resolver()
@@ -21,7 +20,7 @@ export class AuthResolver {
 
   @Mutation(() => AuthResponse)
   async refreshTokens(
-    @Args('userId', { type: () => Int }) userId: number,
+    @Args('userId', { type: () => String }) userId: string,
     @Args('refreshToken', { type: () => String }) refreshToken: string,
   ) {
     return await this.authService.refreshTokens(userId, refreshToken);
@@ -36,7 +35,6 @@ export class AuthResolver {
 
   @Query(() => User)
   @UseGuards(GqlAuthGuard, RolesGuard)
-  @Roles(UserRole.USER, UserRole.ADMIN)
   me(@CurrentUser() user: User) {
     return user;
   }

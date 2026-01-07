@@ -25,7 +25,10 @@ export class AuthService {
   }
 
   async validateJwtPayload(payload: JwtPayload) {
-    const user = await this.usersRepo.findOne({ where: { id: payload.sub } });
+    const user = await this.usersRepo.findOne({
+      where: { id: payload.sub },
+      relations: ['role'],
+    });
     if (!user) {
       throw new UnauthorizedException('Invalid access token');
     }
@@ -41,7 +44,12 @@ export class AuthService {
       2592000000,
     );
 
-    const payload = { sub: user.id, email: user.email, role: user.role };
+    const payload = {
+      sub: user.id,
+      email: user.email,
+      roleId: user.roleId ?? null,
+      role: user.role?.title ?? null,
+    };
     const accessToken = await this.jwt.signAsync(payload, {
       expiresIn: accessExpires,
     });
@@ -74,7 +82,7 @@ export class AuthService {
   }
 
   async refreshTokens(
-    userId: number,
+    userId: string,
     refreshToken: string,
   ): Promise<{ user: User; accessToken: string; refreshToken: string }> {
     const user = await this.usersRepo.findOne({ where: { id: userId } });
@@ -92,7 +100,7 @@ export class AuthService {
     return { user, ...tokens };
   }
 
-  async logout(userId: number): Promise<boolean> {
+  async logout(userId: string): Promise<boolean> {
     await this.usersRepo.update(userId, { refreshTokenHash: null });
     return true;
   }

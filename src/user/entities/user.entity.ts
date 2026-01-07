@@ -4,23 +4,20 @@ import {
   ID,
   GraphQLISODateTime,
   HideField,
-  registerEnumType,
 } from '@nestjs/graphql';
 import {
+  BeforeInsert,
   Column,
   CreateDateColumn,
   Entity,
   Index,
-  PrimaryGeneratedColumn,
+  JoinColumn,
+  ManyToOne,
+  PrimaryColumn,
   UpdateDateColumn,
 } from 'typeorm';
-
-export enum UserRole {
-  USER = 'USER',
-  ADMIN = 'ADMIN',
-}
-
-registerEnumType(UserRole, { name: 'UserRole' });
+import { Role } from 'src/role/entities/role.entity';
+import { v4 as uuidv4 } from 'uuid';
 
 @ObjectType()
 @Entity({ name: 'users' })
@@ -28,8 +25,8 @@ registerEnumType(UserRole, { name: 'UserRole' });
 @Index(['fullName'])
 export class User {
   @Field(() => ID)
-  @PrimaryGeneratedColumn()
-  id: number;
+  @PrimaryColumn('uuid')
+  id: string;
 
   @Field(() => String)
   @Column()
@@ -47,12 +44,17 @@ export class User {
   @Column({ type: 'boolean', default: true })
   isActive: boolean;
 
-  @Field(() => UserRole)
-  @Column({ type: 'enum', enum: UserRole, default: UserRole.USER })
-  role: UserRole;
+  @Field(() => Role)
+  @ManyToOne(() => Role)
+  @JoinColumn({ name: 'roleId' })
+  role: Role;
 
   @HideField()
-  @Column({ type: 'varchar', length: 255, nullable: true })
+  @Column({ type: 'uuid' })
+  roleId: string;
+
+  @HideField()
+  @Column({ type: 'varchar', nullable: true })
   refreshTokenHash?: string | null;
 
   @Field(() => GraphQLISODateTime)
@@ -62,4 +64,11 @@ export class User {
   @Field(() => GraphQLISODateTime)
   @UpdateDateColumn()
   updatedAt: Date;
+
+  @BeforeInsert()
+  generateUUID() {
+    if (!this.id) {
+      this.id = uuidv4();
+    }
+  }
 }
