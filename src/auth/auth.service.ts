@@ -29,6 +29,7 @@ export class AuthService {
       where: { id: payload.sub },
       relations: ['role'],
     });
+
     if (!user) {
       throw new UnauthorizedException('Invalid access token');
     }

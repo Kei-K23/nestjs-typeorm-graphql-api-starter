@@ -10,7 +10,6 @@ import { AuthResolver } from './auth.resolver';
 import { PermissionsGuard } from './permissions.guard';
 import { Permission } from 'src/role/entities/permission.entity';
 import { RolePermission } from 'src/role/entities/role-permission.entity';
-import { APP_GUARD } from '@nestjs/core';
 
 @Module({
   imports: [
@@ -31,15 +30,7 @@ import { APP_GUARD } from '@nestjs/core';
     }),
     TypeOrmModule.forFeature([User, Permission, RolePermission]),
   ],
-  providers: [
-    AuthService,
-    JwtStrategy,
-    AuthResolver,
-    {
-      provide: APP_GUARD,
-      useClass: PermissionsGuard,
-    },
-  ],
+  providers: [AuthService, JwtStrategy, AuthResolver, PermissionsGuard],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

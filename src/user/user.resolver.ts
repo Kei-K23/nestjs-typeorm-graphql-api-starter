@@ -39,15 +39,21 @@ export class UserResolver {
   }
 
   @Mutation(() => User)
-  @UseGuards(GqlAuthGuard)
-  @Permissions('User:UPDATE')
+  @UseGuards(GqlAuthGuard, PermissionsGuard)
+  @Permissions({
+    module: PermissionModule.USER,
+    permission: PermissionType.UPDATE,
+  })
   async updateUser(@Args('updateUserInput') updateUserInput: UpdateUserInput) {
     return await this.userService.update(updateUserInput.id, updateUserInput);
   }
 
   @Mutation(() => User)
-  @UseGuards(GqlAuthGuard)
-  @Permissions('User:DELETE')
+  @UseGuards(GqlAuthGuard, PermissionsGuard)
+  @Permissions({
+    module: PermissionModule.USER,
+    permission: PermissionType.DELETE,
+  })
   async removeUser(@Args('id', { type: () => String }) id: string) {
     return await this.userService.remove(id);
   }
