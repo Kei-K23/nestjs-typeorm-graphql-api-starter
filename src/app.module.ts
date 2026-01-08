@@ -6,6 +6,7 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AuthModule } from './auth/auth.module';
 import { RoleModule } from './role/role.module';
 import { SystemLogModule } from './system-log/system-log.module';
+import { SettingModule } from './setting/setting.module';
 
 @Module({
   imports: [
@@ -34,6 +35,7 @@ import { SystemLogModule } from './system-log/system-log.module';
     AuthModule,
     RoleModule,
     SystemLogModule,
+    SettingModule,
   ],
   controllers: [],
   providers: [],

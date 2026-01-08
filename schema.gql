@@ -105,6 +105,17 @@ type PaginatedSystemLogs {
   offset: Int!
 }
 
+type SMTPResponseDto {
+  smtpHost: String!
+  smtpPort: Int!
+  smtpSecure: Boolean!
+  smtpUsername: String
+  smtpPassword: String
+  smtpFromEmail: String!
+  smtpFromName: String!
+  smtpEnabled: Boolean!
+}
+
 type Query {
   getUsers(search: String, limit: Int = 20, offset: Int = 0, orderDirection: SortDirection, isActive: Boolean, orderBy: UserOrderBy, roleId: String): PaginatedUsers!
   getUserById(id: String!): User!
@@ -113,6 +124,7 @@ type Query {
   getRoleById(id: String!): Role!
   getAllPermissions: [Permission!]!
   getSystemLogs(search: String, limit: Int = 20, offset: Int = 0, orderDirection: SortDirection, userId: String, action: ActivityAction, logType: SystemLogType, startDate: String, endDate: String, orderBy: SystemLogOrderBy): PaginatedSystemLogs!
+  getSMTPSettings: SMTPResponseDto!
 }
 
 enum SortDirection {
@@ -141,6 +153,7 @@ type Mutation {
   updateRole(updateRoleInput: UpdateRoleInput!): Role!
   removeRole(id: String!): Boolean!
   removeAllSystemLogs: Boolean!
+  createSMTPSettings(createSMTPSettingInput: CreateSMTPSettingDto!): SMTPResponseDto!
 }
 
 input CreateUserInput {
@@ -166,7 +179,7 @@ input LoginInput {
 input CreateRoleInput {
   title: String!
   description: String!
-  permissionIds: [String!]
+  permissionIds: [String!]!
 }
 
 input UpdateRoleInput {
@@ -174,4 +187,15 @@ input UpdateRoleInput {
   description: String
   permissionIds: [String!]
   id: String!
+}
+
+input CreateSMTPSettingDto {
+  smtpHost: String!
+  smtpPort: Int!
+  smtpSecure: Boolean!
+  smtpUsername: String!
+  smtpPassword: String!
+  smtpFromEmail: String!
+  smtpFromName: String!
+  smtpEnabled: Boolean!
 }
