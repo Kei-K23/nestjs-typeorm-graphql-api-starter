@@ -63,6 +63,48 @@ type AuthResponse {
   user: User!
 }
 
+type SystemLog {
+  id: Int!
+  userId: String!
+  user: User!
+  action: ActivityAction!
+  description: String!
+  logType: SystemLogType!
+  resourceType: String
+  resourceId: String
+  ipAddress: String
+  userAgent: String
+  device: String
+  browser: String
+  os: String
+  location: String
+  metadata: String
+  createdAt: DateTime!
+}
+
+enum ActivityAction {
+  LOGIN
+  LOGOUT
+  CREATE
+  UPDATE
+  DELETE
+  CHANGE_PASSWORD
+  RESET_PASSWORD
+  REFRESH_TOKEN
+}
+
+enum SystemLogType {
+  ACTIVITY
+  AUDIT
+}
+
+type PaginatedSystemLogs {
+  items: [SystemLog!]!
+  total: Int!
+  limit: Int!
+  offset: Int!
+}
+
 type Query {
   getUsers(search: String, limit: Int = 20, offset: Int = 0, orderDirection: SortDirection, isActive: Boolean, orderBy: UserOrderBy, roleId: String): PaginatedUsers!
   getUserById(id: String!): User!
@@ -70,6 +112,7 @@ type Query {
   getAllRoles: [Role!]!
   getRoleById(id: String!): Role!
   getAllPermissions: [Permission!]!
+  getSystemLogs(search: String, limit: Int = 20, offset: Int = 0, orderDirection: SortDirection, userId: String, action: ActivityAction, logType: SystemLogType, startDate: String, endDate: String, orderBy: SystemLogOrderBy): PaginatedSystemLogs!
 }
 
 enum SortDirection {
@@ -83,6 +126,10 @@ enum UserOrderBy {
   EMAIL
 }
 
+enum SystemLogOrderBy {
+  CREATED_AT
+}
+
 type Mutation {
   createUser(createUserInput: CreateUserInput!): User!
   updateUser(updateUserInput: UpdateUserInput!): User!
@@ -93,6 +140,7 @@ type Mutation {
   createRole(createRoleInput: CreateRoleInput!): Role!
   updateRole(updateRoleInput: UpdateRoleInput!): Role!
   removeRole(id: String!): Boolean!
+  removeAllSystemLogs: Boolean!
 }
 
 input CreateUserInput {
