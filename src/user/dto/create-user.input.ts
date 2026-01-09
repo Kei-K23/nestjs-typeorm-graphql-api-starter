@@ -2,6 +2,7 @@ import { InputType, Field } from '@nestjs/graphql';
 import {
   IsEmail,
   IsNotEmpty,
+  IsOptional,
   IsString,
   IsUUID,
   MinLength,
@@ -20,6 +21,11 @@ export class CreateUserInput {
   @IsNotEmpty()
   @IsEmail()
   email: string;
+
+  @Field(() => String, { nullable: true })
+  @IsString()
+  @IsOptional()
+  profilePictureUrl?: string;
 
   @Field(() => String)
   @IsString()

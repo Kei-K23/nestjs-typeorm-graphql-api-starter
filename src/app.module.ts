@@ -7,6 +7,7 @@ import { AuthModule } from './auth/auth.module';
 import { RoleModule } from './role/role.module';
 import { SystemLogModule } from './system-log/system-log.module';
 import { SettingModule } from './setting/setting.module';
+import { UploadModule } from './upload/upload.module';
 
 @Module({
   imports: [
@@ -36,6 +37,7 @@ import { SettingModule } from './setting/setting.module';
     RoleModule,
     SystemLogModule,
     SettingModule,
+    UploadModule,
   ],
   controllers: [],
   providers: [],

@@ -36,6 +36,10 @@ export class User {
   @Column()
   email: string;
 
+  @Field(() => String, { nullable: true })
+  @Column({ nullable: true })
+  profilePictureUrl: string;
+
   @HideField()
   @Column()
   password: string;

@@ -10,6 +10,7 @@ import { AuthResolver } from './auth.resolver';
 import { PermissionsGuard } from './permissions.guard';
 import { Permission } from 'src/role/entities/permission.entity';
 import { RolePermission } from 'src/role/entities/role-permission.entity';
+import { S3ClientUtils } from 'src/common/utils/s3-client.utils';
 
 @Module({
   imports: [
@@ -30,7 +31,13 @@ import { RolePermission } from 'src/role/entities/role-permission.entity';
     }),
     TypeOrmModule.forFeature([User, Permission, RolePermission]),
   ],
-  providers: [AuthService, JwtStrategy, AuthResolver, PermissionsGuard],
+  providers: [
+    AuthService,
+    JwtStrategy,
+    AuthResolver,
+    PermissionsGuard,
+    S3ClientUtils,
+  ],
   exports: [AuthService, JwtModule],
 })
 export class AuthModule {}

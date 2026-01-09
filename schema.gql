@@ -44,6 +44,7 @@ type User {
   id: ID!
   fullName: String!
   email: String!
+  profilePictureUrl: String
   isActive: Boolean!
   role: Role!
   createdAt: DateTime!
@@ -116,6 +117,13 @@ type SMTPResponseDto {
   smtpEnabled: Boolean!
 }
 
+type UploadResponse {
+  key: String!
+  size: Int!
+  mimeType: String!
+  filename: String!
+}
+
 type Query {
   getUsers(search: String, limit: Int = 20, offset: Int = 0, orderDirection: SortDirection, isActive: Boolean, orderBy: UserOrderBy, roleId: String): PaginatedUsers!
   getUserById(id: String!): User!
@@ -154,11 +162,14 @@ type Mutation {
   removeRole(id: String!): Boolean!
   removeAllSystemLogs: Boolean!
   createSMTPSettings(createSMTPSettingInput: CreateSMTPSettingDto!): SMTPResponseDto!
+  uploadFile(uploadFileInput: UploadFileInput!): UploadResponse!
+  deleteFile(key: String!): Boolean!
 }
 
 input CreateUserInput {
   fullName: String!
   email: String!
+  profilePictureUrl: String
   password: String!
   roleId: String!
 }
@@ -166,6 +177,7 @@ input CreateUserInput {
 input UpdateUserInput {
   fullName: String
   email: String
+  profilePictureUrl: String
   password: String
   roleId: String
   id: String!
@@ -198,4 +210,10 @@ input CreateSMTPSettingDto {
   smtpFromEmail: String!
   smtpFromName: String!
   smtpEnabled: Boolean!
+}
+
+input UploadFileInput {
+  fileBase64: String!
+  mimeType: String!
+  folder: String!
 }

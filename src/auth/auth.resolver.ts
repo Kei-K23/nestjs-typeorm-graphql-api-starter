@@ -8,10 +8,14 @@ import { User } from 'src/user/entities/user.entity';
 import { CurrentUser } from './current-user.decorator';
 import { SystemLog } from 'src/system-log/system-log.decorator';
 import { ActivityAction } from 'src/system-log/entities/system-log.entity';
+import { S3ClientUtils } from 'src/common/utils/s3-client.utils';
 
 @Resolver()
 export class AuthResolver {
-  constructor(private readonly authService: AuthService) {}
+  constructor(
+    private readonly authService: AuthService,
+    private readonly s3ClientUtils: S3ClientUtils,
+  ) {}
 
   @Mutation(() => AuthResponse)
   @SystemLog({
@@ -51,7 +55,12 @@ export class AuthResolver {
 
   @Query(() => User)
   @UseGuards(GqlAuthGuard)
-  me(@CurrentUser() user: User) {
+  async me(@CurrentUser() user: User) {
+    user.profilePictureUrl = user?.profilePictureUrl
+      ? (await this.s3ClientUtils.generatePresignedUrl(
+          user?.profilePictureUrl || '',
+        )) || ''
+      : '';
     return user;
   }
 }
