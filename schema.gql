@@ -157,12 +157,16 @@ type Mutation {
   login(loginInput: LoginInput!): AuthResponse!
   refreshTokens(userId: String!, refreshToken: String!): AuthResponse!
   logout: Boolean!
+  requestPasswordReset(forgotPasswordInput: ForgotPasswordInput!): Boolean!
+  resetPassword(resetPasswordInput: ResetPasswordInput!): Boolean!
+  verifyPasswordResetCode(email: String!, code: String!): Boolean!
   createRole(createRoleInput: CreateRoleInput!): Role!
   updateRole(updateRoleInput: UpdateRoleInput!): Role!
   removeRole(id: String!): Boolean!
   removeAllSystemLogs: Boolean!
   createSMTPSettings(createSMTPSettingInput: CreateSMTPSettingDto!): SMTPResponseDto!
   uploadFile(uploadFileInput: UploadFileInput!): UploadResponse!
+  uploadFiles(inputs: [UploadFileInput!]!): [UploadResponse!]!
   deleteFile(key: String!): Boolean!
 }
 
@@ -186,6 +190,16 @@ input UpdateUserInput {
 input LoginInput {
   email: String!
   password: String!
+}
+
+input ForgotPasswordInput {
+  email: String!
+}
+
+input ResetPasswordInput {
+  email: String!
+  code: String!
+  newPassword: String!
 }
 
 input CreateRoleInput {

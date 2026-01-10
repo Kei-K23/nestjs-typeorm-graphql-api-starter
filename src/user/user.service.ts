@@ -8,11 +8,13 @@ import { GetUsersArgs, UserOrderBy } from './dto/get-users.args';
 import { SortDirection } from 'src/common/dto/default-filter.dto';
 import { AuthService } from 'src/auth/auth.service';
 import { Role } from 'src/role/entities/role.entity';
+import { S3ClientUtils } from 'src/common/utils/s3-client.utils';
 
 @Injectable()
 export class UserService {
   constructor(
     private authService: AuthService,
+    private s3ClientUtils: S3ClientUtils,
     @InjectRepository(User)
     private usersRepository: Repository<User>,
     @InjectRepository(Role)
@@ -75,6 +77,16 @@ export class UserService {
 
     const [users, total] = await qb.getManyAndCount();
 
+    await Promise.all(
+      users.map(async (user) => {
+        user.profilePictureUrl = user?.profilePictureUrl
+          ? (await this.s3ClientUtils.generatePresignedUrl(
+              user?.profilePictureUrl || '',
+            )) || ''
+          : '';
+      }),
+    );
+
     return {
       items: users,
       total,
@@ -92,6 +104,13 @@ export class UserService {
     if (!user) {
       throw new NotFoundException(`User not found with id ${id}`);
     }
+
+    user.profilePictureUrl = user?.profilePictureUrl
+      ? (await this.s3ClientUtils.generatePresignedUrl(
+          user?.profilePictureUrl || '',
+        )) || ''
+      : '';
+
     return user;
   }
 

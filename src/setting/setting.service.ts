@@ -56,7 +56,7 @@ export class SettingService {
       smtpPort: smtpPortStr ? parseInt(smtpPortStr) : 0,
       smtpSecure: smtpSecureStr === 'true',
       smtpUsername: map.get('smtpUsername') || undefined,
-      smtpPassword: undefined,
+      smtpPassword: map.get('smtpPassword') || undefined,
       smtpFromEmail: map.get('smtpFromEmail') ?? '',
       smtpFromName: map.get('smtpFromName') ?? '',
       smtpEnabled: smtpEnabledStr === 'true',

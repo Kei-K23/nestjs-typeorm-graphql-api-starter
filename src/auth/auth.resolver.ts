@@ -9,6 +9,8 @@ import { CurrentUser } from './current-user.decorator';
 import { SystemLog } from 'src/system-log/system-log.decorator';
 import { ActivityAction } from 'src/system-log/entities/system-log.entity';
 import { S3ClientUtils } from 'src/common/utils/s3-client.utils';
+import { ForgotPasswordInput } from './dto/forgot-password.input';
+import { ResetPasswordInput } from './dto/reset-password.input';
 
 @Resolver()
 export class AuthResolver {
@@ -62,5 +64,32 @@ export class AuthResolver {
         )) || ''
       : '';
     return user;
+  }
+
+  @Mutation(() => Boolean)
+  async requestPasswordReset(
+    @Args('forgotPasswordInput')
+    forgotPasswordInput: ForgotPasswordInput,
+  ): Promise<boolean> {
+    return await this.authService.requestPasswordReset(
+      forgotPasswordInput.email,
+    );
+  }
+
+  @Mutation(() => Boolean)
+  async resetPassword(
+    @Args('resetPasswordInput')
+    resetPasswordInput: ResetPasswordInput,
+  ): Promise<boolean> {
+    const { email, code, newPassword } = resetPasswordInput;
+    return await this.authService.resetPassword(email, code, newPassword);
+  }
+
+  @Mutation(() => Boolean)
+  async verifyPasswordResetCode(
+    @Args('email', { type: () => String }) email: string,
+    @Args('code', { type: () => String }) code: string,
+  ): Promise<boolean> {
+    return await this.authService.verifyPasswordResetCode(email, code);
   }
 }

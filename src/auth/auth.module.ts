@@ -10,7 +10,9 @@ import { AuthResolver } from './auth.resolver';
 import { PermissionsGuard } from './permissions.guard';
 import { Permission } from 'src/role/entities/permission.entity';
 import { RolePermission } from 'src/role/entities/role-permission.entity';
+import { Setting } from 'src/setting/entities/setting.entity';
 import { S3ClientUtils } from 'src/common/utils/s3-client.utils';
+import { EmailServiceUtils } from 'src/common/utils/email-service.utils';
 
 @Module({
   imports: [
@@ -29,7 +31,7 @@ import { S3ClientUtils } from 'src/common/utils/s3-client.utils';
         };
       },
     }),
-    TypeOrmModule.forFeature([User, Permission, RolePermission]),
+    TypeOrmModule.forFeature([User, Permission, RolePermission, Setting]),
   ],
   providers: [
     AuthService,
@@ -37,6 +39,7 @@ import { S3ClientUtils } from 'src/common/utils/s3-client.utils';
     AuthResolver,
     PermissionsGuard,
     S3ClientUtils,
+    EmailServiceUtils,
   ],
   exports: [AuthService, JwtModule],
 })

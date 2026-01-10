@@ -61,6 +61,14 @@ export class User {
   @Column({ type: 'varchar', nullable: true })
   refreshTokenHash?: string | null;
 
+  @HideField()
+  @Column({ type: 'varchar', nullable: true })
+  passwordResetTokenHash?: string | null;
+
+  @HideField()
+  @Column({ type: 'datetime', nullable: true })
+  passwordResetExpiresAt?: Date | null;
+
   @Field(() => GraphQLISODateTime)
   @CreateDateColumn()
   createdAt: Date;
